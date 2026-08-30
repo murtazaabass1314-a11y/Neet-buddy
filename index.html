@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CARTOON MEDIA AI</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="logo">🎬</div>
+      <div>
+        <h1>CARTOON MEDIA AI</h1>
+        <p>Story → Cartoon Short</p>
+      </div>
+    </header>
+
+    <section class="card">
+      <label for="story">Your story</label>
+      <textarea id="story" maxlength="2500"
+        placeholder="Example: A little rabbit finds a magic mango, but a clever crow tries to steal it..."></textarea>
+
+      <label for="style">Cartoon style</label>
+      <select id="style">
+        <option>cute 3D cartoon</option>
+        <option>2D colorful cartoon</option>
+        <option>anime-inspired cartoon</option>
+        <option>storybook cartoon</option>
+      </select>
+
+      <label for="duration">Length</label>
+      <select id="duration">
+        <option value="20">20 seconds</option>
+        <option value="8">8 seconds</option>
+      </select>
+
+      <button id="generate">✨ Generate Cartoon Video</button>
+      <div id="status" class="status"></div>
+    </section>
+
+    <section id="result" class="card hidden">
+      <h2>Your video</h2>
+      <video id="video" controls playsinline></video>
+      <a id="download" class="download" download="cartoon-media-ai.mp4">⬇️ Download MP4</a>
+    </section>
+
+    <footer>
+      Keep your API key on the server. Never put it in this HTML/JavaScript.
+    </footer>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
