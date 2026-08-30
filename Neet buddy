@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEET Buddy</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:#f5f7fb;color:#172033;transition:.25s}
+body.dark{background:#0f172a;color:#f8fafc}
+
+header{
+background:#111827;color:white;padding:24px 18px;
+border-radius:0 0 28px 28px
+}
+.container{max-width:720px;margin:auto;padding:18px}
+h1{font-size:29px}
+h2{margin-bottom:10px}
+
+.card{
+background:white;padding:18px;border-radius:20px;
+margin-bottom:16px;box-shadow:0 5px 20px #0000000d
+}
+.dark .card{background:#1e293b}
+
+.grid{
+display:grid;grid-template-columns:repeat(3,1fr);gap:10px
+}
+.subject{
+padding:20px 7px;border-radius:17px;text-align:center;
+font-weight:bold;cursor:pointer;background:#e8edff
+}
+.subject:nth-child(2){background:#e6f8ef}
+.subject:nth-child(3){background:#fff1df}
+
+.progress{
+height:13px;background:#e5e7eb;border-radius:20px;
+overflow:hidden;margin-top:12px
+}
+.progressBar{
+height:100%;width:0%;background:#2563eb;transition:.4s
+}
+
+.stats{
+display:grid;grid-template-columns:repeat(3,1fr);
+gap:8px;margin-top:15px
+}
+.stat{
+background:#f1f5f9;padding:13px;border-radius:14px;
+text-align:center
+}
+.dark .stat{background:#334155}
+
+.stat b{display:block;font-size:20px}
+
+button{
+border:0;padding:12px 15px;border-radius:12px;
+background:#111827;color:white;font-weight:bold;
+cursor:pointer;margin-top:8px
+}
+button:active{transform:scale(.97)}
+
+.back{margin-bottom:15px}
+
+.topic{
+display:flex;align-items:center;gap:10px;
+padding:14px 0;border-bottom:1px solid #ddd
+}
+.topic input{width:20px;height:20px}
+
+.search{
+width:100%;padding:13px;border:1px solid #ddd;
+border-radius:12px;margin:10px 0 15px;
+font-size:16px
+}
+
+.timer{
+font-size:46px;font-weight:bold;text-align:center;
+margin:15px
+}
+
+.option{
+display:block;width:100%;text-align:left;
+background:#f1f5f9;color:#111827;margin:8px 0
+}
+.correct{background:#86efac!important}
+.wrong{background:#fca5a5!important}
+
+.hidden{display:none}
+
+.nav{
+position:sticky;bottom:8px;background:white;
+padding:10px;border-radius:18px;
+display:flex;gap:7px;
+box-shadow:0 5px 25px #0002
+}
+.dark .nav{background:#1e293b}
+.nav button{flex:1;margin:0;padding:11px 5px;font-size:12px}
+
+.small{opacity:.7;font-size:13px}
+
+.result{
+text-align:center;padding:20px
+}
+.result h1{font-size:45px;margin:10px}
+
+select{
+width:100%;padding:12px;border-radius:12px;
+border:1px solid #ddd;margin-top:8px;
+font-size:16px
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="container">
+<h1>🧠 NEET Buddy</h1>
+<p>Your personal NEET study companion</p>
+</div>
+</header>
+
+<div class="container">
+
+<!-- HOME -->
+<section id="home">
+
+<div class="card">
+<h2>📊 Your Progress</h2>
+
+<div class="progress">
+<div id="progressBar" class="progressBar"></div>
+</div>
+
+<p id="progressText" style="margin-top:8px">0% completed</p>
+
+<div class="stats">
+<div class="stat">
+<b id="doneTopics">0</b>
+<span>Topics</span>
+</div>
+
+<div class="stat">
+<b id="quizBest">0%</b>
+<span>Best Quiz</span>
+</div>
+
+<div class="stat">
+<b id="streak">0</b>
+<span>Day Streak</span>
+</div>
+</div>
+</div>
+
+
+<div class="card">
+<h2>📚 Subjects</h2>
+
+<div class="grid">
+
+<div class="subject" onclick="openSubject('Physics')">
+⚡<br>Physics
+</div>
+
+<div class="subject" onclick="openSubject('Chemistry')">
+🧪<br>Chemistry
+</div>
+
+<div class="subject" onclick="openSubject('Biology')">
+🧬<br>Biology
+</div>
+
+</div>
+</div>
+
+
+<div class="card">
+<h2>⏱️ Pomodoro</h2>
+
+<div id="timer" class="timer">25:00</div>
+
+<div style="text-align:center">
+<button onclick="startTimer()">Start</button>
+<button onclick="pauseTimer()">Pause</button>
+<button onclick="resetTimer()">Reset</button>
+</div>
+</div>
+
+
+<div class="card">
+<h2>🎯 Quick Quiz</h2>
+
+<p class="small">
+Test yourself with NEET-style questions.
+</p>
+
+<select id="quizLength">
+<option value="10">10 Questions</option>
+<option value="20">20 Questions</option>
+<option value="30">30 Questions</option>
+</select>
+
+<button onclick="startQuiz()">Start Quiz →</button>
+</div>
+
+</section>
+
+
+<!-- SUBJECT PAGE -->
+<section id="subjectPage" class="hidden">
+
+<div class="card">
+
+<button class="back" onclick="goHome()">← Back</button>
+
+<h2 id="subjectTitle"></h2>
+
+<input
+id="search"
+class="search"
+placeholder="🔍 Search chapter..."
+oninput="filterTopics()"
+>
+
+<div id="topics"></div>
+
+</div>
+
+</section>
+
+
+<!-- QUIZ PAGE -->
+<section id="quizPage" class="hidden">
+
+<div class="card">
+
+<button onclick="goHome()">← Exit Quiz</button>
+
+<p class="small" id="quizNumber"></p>
+
+<h2 id="question" style="margin-top:15px"></h2>
+
+<div id="options"></div>
+
+<p id="quizMessage" style="margin-top:12px"></p>
+
+<button id="nextBtn" onclick="nextQuestion()">
+Next →
+</button>
+
+</div>
+
+</section>
+
+
+<!-- RESULT PAGE -->
+<section id="resultPage" class="hidden">
+
+<div class="card result">
+
+<h2>🎉 Quiz Completed!</h2>
+
+<h1 id="finalScore">0%</h1>
+
+<p id="finalDetails"></p>
+
+<button onclick="reviewWrong()">
+Review Wrong Answers
+</button>
+
+<button onclick="startQuiz()">
+Try Again
+</button>
+
+<button onclick="goHome()">
+Home
+</button>
+
+</div>
+
+</section>
+
+
+<!-- REVIEW PAGE -->
+<section id="reviewPage" class="hidden">
+
+<div class="card">
+
+<button onclick="goHome()">← Home</button>
+
+<h2>❌ Wrong Answers</h2>
+
+<div id="wrongList"></div>
+
+</div>
+
+</section>
+
+
+<!-- NAV -->
+<div class="nav">
+
+<button onclick="goHome()">🏠 Home</button>
+
+<button onclick="startQuiz()">🧠 Quiz</button>
+
+<button onclick="toggleDark()">🌙 Mode</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   CHAPTERS
+========================= */
+
+const subjects={
+
+Physics:[
+"Units & Measurements",
+"Motion in a Straight Line",
+"Motion in a Plane",
+"Laws of Motion",
+"Work, Energy & Power",
+"System of Particles",
+"Rotational Motion",
+"Gravitation",
+"Properties of Bulk Matter",
+"Thermodynamics",
+"Oscillations",
+"Waves"
+],
+
+Chemistry:[
+"Some Basic Concepts of Chemistry",
+"Structure of Atom",
+"Classification of Elements",
+"Chemical Bonding",
+"Thermodynamics",
+"Equilibrium",
+"Redox Reactions",
+"Organic Chemistry Basics",
+"Hydrocarbons",
+"Solutions",
+"Electrochemistry",
+"Chemical Kinetics"
+],
+
+Biology:[
+"The Living World",
+"Biological Classification",
+"Plant Kingdom",
+"Animal Kingdom",
+"Morphology of Flowering Plants",
+"Anatomy of Flowering Plants",
+"Cell Structure",
+"Biomolecules",
+"Cell Cycle",
+"Human Physiology",
+"Plant Physiology",
+"Ecology"
+]
+
+};
+
+
+/* =========================
+   STORAGE
+========================= */
+
+let completed=
+JSON.parse(localStorage.getItem("neetCompleted"))||{};
+
+let best=
+Number(localStorage.getItem("neetBest"))||0;
+
+let lastStudy=
+localStorage.getItem("neetLastStudy");
+
+let streak=
+Number(localStorage.getItem("neetStreak"))||0;
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function hideAll(){
+
+["home","subjectPage","quizPage","resultPage","reviewPage"]
+.forEach(id=>{
+document.getElementById(id).classList.add("hidden")
+});
+
+}
+
+function goHome(){
+
+hideAll();
+
+document.getElementById("home")
+.classList.remove("hidden");
+
+updateProgress();
+}
+
+
+/* =========================
+   PROGRESS
+========================= */
+
+function totalTopics(){
+
+return Object.values(subjects)
+.flat().length;
+
+}
+
+function updateProgress(){
+
+let total=totalTopics();
+
+let done=Object.values(completed)
+.filter(Boolean).length;
+
+let percent=Math.round(done/total*100);
+
+document.getElementById("progressBar")
+.style.width=percent+"%";
+
+document.getElementById("progressText")
+.innerText=percent+"% completed";
+
+document.getElementById("doneTopics")
+.innerText=done;
+
+document.getElementById("quizBest")
+.innerText=best+"%";
+
+document.getElementById("streak")
+.innerText=streak;
+
+}
+
+
+/* =========================
+   SUBJECTS
+========================= */
+
+let currentSubject="";
+
+function openSubject(subject){
+
+currentSubject=subject;
+
+hideAll();
+
+document.getElementById("subjectPage")
+.classList.remove("hidden");
+
+document.getElementById("subjectTitle")
+.innerText=subject;
+
+document.getElementById("search").value="";
+
+renderTopics();
+
+}
+
+function renderTopics(){
+
+let box=document.getElementById("topics");
+
+box.innerHTML="";
+
+let search=
+document.getElementById("search").value
+.toLowerCase();
+
+subjects[currentSubject]
+.forEach((topic,index)=>{
+
+if(!topic.toLowerCase().includes(search)) return;
+
+let id=currentSubject+"_"+index;
+
+box.innerHTML+=`
+
+<div class="topic">
+
+<input
+type="checkbox"
+${completed[id]?"checked":""}
+onchange="toggleTopic('${id}')"
+>
+
+<span>${topic}</span>
+
+</div>
+
+`;
+
+});
+
+}
+
+function filterTopics(){
+renderTopics();
+}
+
+function toggleTopic(id){
+
+completed[id]=!completed[id];
+
+localStorage.setItem(
+"neetCompleted",
+JSON.stringify(completed)
+);
+
+markStudyDay();
+
+updateProgress();
+
+}
+
+
+/* =========================
+   STREAK
+========================= */
+
+function markStudyDay(){
+
+let today=new Date().toDateString();
+
+if(lastStudy===today) return;
+
+let yesterday=
+new Date(Date.now()-86400000)
+.toDateString();
+
+if(lastStudy===yesterday){
+streak++;
+}else{
+streak=1;
+}
+
+lastStudy=today;
+
+localStorage.setItem("neetLastStudy",today);
+localStorage.setItem("neetStreak",streak);
+
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+let time=25*60;
+let timerInterval=null;
+
+function showTimer(){
+
+let min=Math.floor(time/60);
+let sec=time%60;
+
+document.getElementById("timer")
+.innerText=
+String(min).padStart(2,"0")+":"+
+String(sec).padStart(2,"0");
+
+}
+
+function startTimer(){
+
+if(timerInterval) return;
+
+timerInterval=setInterval(()=>{
+
+if(time>0){
+
+time--;
+showTimer();
+
+}else{
+
+pauseTimer();
+
+alert("🎉 Pomodoro completed!");
+
+}
+
+},1000);
+
+}
+
+function pauseTimer(){
+
+clearInterval(timerInterval);
+timerInterval=null;
+
+}
+
+function resetTimer(){
+
+pauseTimer();
+
+time=25*60;
+
+showTimer();
+
+}
+
+
+/* =========================
+   QUESTION BANK
+========================= */
+
+const questions=[
+
+{
+q:"What is the SI unit of force?",
+o:["Joule","Newton","Watt","Pascal"],
+a:1
+},
+
+{
+q:"Acceleration is the rate of change of:",
+o:["Distance","Velocity","Mass","Time"],
+a:1
+},
+
+{
+q:"Which law explains inertia?",
+o:["Newton's First Law","Newton's Second Law","Newton's Third Law","Law of Gravitation"],
+a:0
+},
+
+{
+q:"The SI unit of energy is:",
+o:["Newton","Joule","Watt","Pascal"],
+a:1
+},
+
+{
+q:"Which quantity is a vector?",
+o:["Speed","Distance","Mass","Velocity"],
+a:3
+},
+
+{
+q:"The slope of a velocity-time graph represents:",
+o:["Distance","Acceleration","Speed","Displacement"],
+a:1
+},
+
+{
+q:"Which organelle is called the powerhouse of the cell?",
+o:["Nucleus","Ribosome","Mitochondria","Golgi body"],
+a:2
+},
+
+{
+q:"Genetic material in most organisms is:",
+o:["Protein","DNA","Lipid","Glucose"],
+a:1
+},
+
+{
+q:"The basic unit of life is:",
+o:["Tissue","Organ","Cell","Atom"],
+a:2
+},
+
+{
+q:"Photosynthesis mainly occurs in:",
+o:["Mitochondria","Chloroplasts","Nucleus","Ribosomes"],
+a:1
+},
+
+{
+q:"Which molecule carries genetic information?",
+o:["DNA","ATP","Glucose","Water"],
+a:0
+},
+
+{
+q:"Ribosomes are mainly involved in:",
+o:["Protein synthesis","Respiration","Photosynthesis","Digestion"],
+a:0
+},
+
+{
+q:"Atomic number represents the number of:",
+o:["Neutrons","Protons","Nucleons","Isotopes"],
+a:1
+},
+
+{
+q:"The charge of an electron is:",
+o:["Positive","Negative","Neutral","Variable"],
+a:1
+},
+
+{
+q:"Which particle has no electrical charge?",
+o:["Proton","Electron","Neutron","Ion"],
+a:2
+},
+
+{
+q:"The pH of a neutral solution at 25°C is approximately:",
+o:["0","5","7","14"],
+a:2
+},
+
+{
+q:"Which gas is most abundant in Earth's atmosphere?",
+o:["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"],
+a:2
+},
+
+{
+q:"Avogadro's number is approximately:",
+o:["6.022 × 10²³","9.8","3 × 10⁸","1.6 × 10⁻¹⁹"],
+a:0
+},
+
+{
+q:"Which bond involves sharing of electrons?",
+o:["Ionic","Covalent","Metallic","Hydrogen"],
+a:1
+},
+
+{
+q:"Water has the chemical formula:",
+o:["CO₂","H₂O","O₂","H₂"],
+a:1
+},
+
+{
+q:"The powerhouse of the cell produces mainly:",
+o:["DNA","ATP","Protein","Glucose"],
+a:1
+},
+
+{
+q:"Which blood cells transport oxygen?",
+o:["WBC","Platelets","RBC","Plasma"],
+a:2
+},
+
+{
+q:"The human heart normally has:",
+o:["2 chambers","3 chambers","4 chambers","5 chambers"],
+a:2
+},
+
+{
+q:"Which organ filters blood and produces urine?",
+o:["Liver","Kidney","Heart","Lung"],
+a:1
+},
+
+{
+q:"The functional unit of the kidney is:",
+o:["Neuron","Nephron","Alveolus","Villus"],
+a:1
+},
+
+{
+q:"DNA stands for:",
+o:["Deoxyribonucleic Acid",
+"Dinucleic Acid",
+"Deoxyribose Nitrogen Acid",
+"Double Nucleic Acid"],
+a:0
+},
+
+{
+q:"Which vitamin is mainly produced in skin with sunlight exposure?",
+o:["Vitamin A","Vitamin B12","Vitamin C","Vitamin D"],
+a:3
+},
+
+{
+q:"Which part of the brain helps maintain balance?",
+o:["Cerebrum","Cerebellum","Medulla","Hypothalamus"],
+a:1
+},
+
+{
+q:"The process by which plants lose water vapour is called:",
+o:["Respiration","Transpiration","Photosynthesis","Osmosis"],
+a:1
+},
+
+{
+q:"Which molecule is the main immediate energy currency of cells?",
+o:["DNA","ATP","RNA","Glucose"],
+a:1
+}
+
+];
+
+
+/* =========================
+   QUIZ
+========================= */
+
+let quizQuestions=[];
+let quizIndex=0;
+let quizScore=0;
+let quizAnswered=false;
+let wrongAnswers=[];
+
+
+function startQuiz(){
+
+hideAll();
+
+document.getElementById("quizPage")
+.classList.remove("hidden");
+
+let amount=
+Number(document.getElementById("quizLength")?.value)||10;
+
+quizQuestions=[...questions]
+.sort(()=>Math.random()-.5)
+.slice(0,amount);
+
+quizIndex=0;
+quizScore=0;
+wrongAnswers=[];
+
+loadQuestion();
+
+}
+
+function loadQuestion(){
+
+quizAnswered=false;
+
+let q=quizQuestions[quizIndex];
+
+document.getElementById("quizNumber")
+.innerText=
+"Question "+(quizIndex+1)+" / "+quizQuestions.length;
+
+document.getElementById("question")
+.innerText=q.q;
+
+document.getElementById("quizMessage")
+.innerText="";
+
+let box=document.getElementById("options");
+
+box.innerHTML="";
+
+q.o.forEach((option,index)=>{
+
+let btn=document.createElement("button");
+
+btn.className="option";
+
+btn.innerText=option;
+
+btn.onclick=()=>answerQuestion(index,btn);
+
+box.appendChild(btn);
+
+});
+
+}
+
+function answerQuestion(index,button){
+
+if(quizAnswered)return;
+
+quizAnswered=true;
+
+let q=quizQuestions[quizIndex];
+
+if(index===q.a){
+
+button.classList.add("correct");
+
+quizScore++;
+
+document.getElementById("quizMessage")
+.innerText="✅ Correct!";
+
+}else{
+
+button.classList.add("wrong");
+
+document.getElementById("quizMessage")
+.innerText=
+"❌ Correct answer: "+q.o[q.a];
+
+wrongAnswers.push({
+question:q.q,
+yourAnswer:q.o[index],
+correct:q.o[q.a]
+});
+
+}
+
+}
+
+function nextQuestion(){
+
+if(!quizAnswered){
+
+document.getElementById("quizMessage")
+.innerText="Choose an answer first.";
+
+return;
+
+}
+
+if(quizIndex<quizQuestions.length-1){
+
+quizIndex++;
+
+loadQuestion();
+
+}else{
+
+finishQuiz();
+
+}
+
+}
+
+function finishQuiz(){
+
+hideAll();
+
+document.getElementById("resultPage")
+.classList.remove("hidden");
+
+let percent=
+Math.round(
+quizScore/quizQuestions.length*100
+);
+
+if(percent>best){
+
+best=percent;
+
+localStorage.setItem(
+"neetBest",best
+);
+
+}
+
+document.getElementById("finalScore")
+.innerText=percent+"%";
+
+document.getElementById("finalDetails")
+.innerText=
+quizScore+" correct out of "+
+quizQuestions.length+
+" • "+wrongAnswers.length+
+" wrong";
+
+updateProgress();
+
+}
+
+function reviewWrong(){
+
+hideAll();
+
+document.getElementById("reviewPage")
+.classList.remove("hidden");
+
+let box=document.getElementById("wrongList");
+
+if(wrongAnswers.length===0){
+
+box.innerHTML=
+"<p>🎉 No wrong answers! Excellent.</p>";
+
+return;
+
+}
+
+box.innerHTML="";
+
+wrongAnswers.forEach((item,i)=>{
+
+box.innerHTML+=`
+
+<div class="card">
+
+<b>${i+1}. ${item.question}</b>
+
+<p style="margin-top:10px">
+❌ Your answer: ${item.yourAnswer}
+</p>
+
+<p style="margin-top:7px">
+✅ Correct: ${item.correct}
+</p>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+/* =========================
+   DARK MODE
+========================= */
+
+function toggleDark(){
+
+document.body.classList.toggle("dark");
+
+localStorage.setItem(
+"neetDark",
+document.body.classList.contains("dark")
+);
+
+}
+
+if(localStorage.getItem("neetDark")==="true"){
+document.body.classList.add("dark");
+}
+
+
+/* =========================
+   INIT
+========================= */
+
+updateProgress();
+showTimer();
+
+</script>
+
+</body>
+</html>
